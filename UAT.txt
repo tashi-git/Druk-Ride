@@ -1,12 +1,9 @@
 # User Acceptance Testing (UAT) Checklist for DrukRide App
 
-## Test Environment Setup
-- [ ] Application deployed to UAT environment
-- [ ] Database schema created and populated with test data
-- [ ] All dependencies installed correctly
+## Test Environment
 - [ ] Application accessible via web browser
 
-## User Registration and Authentication
+## User Registratison and Authentication
 - [ ] User can register with valid details (name, phone, email, password, user type)
 - [ ] User receives appropriate error messages for invalid registration data
 - [ ] User can login with correct credentials
@@ -43,7 +40,6 @@
 - [ ] Reporting time and departure time are displayed correctly
 - [ ] Booking status is shown accurately (Confirmed, Cancelled, Rescheduled)
 
-## Counter User Features
 ### Counter Dashboard
 - [ ] Counter user can access dashboard after login
 - [ ] Dashboard shows today's statistics (total bookings, confirmed, cancelled, revenue, available seats)
@@ -74,46 +70,8 @@
 - [ ] Phone number validation works correctly
 - [ ] Date validations prevent past date bookings
 
-## Performance and Usability
-- [ ] Page load times are acceptable (< 3 seconds)
-- [ ] Seat selection is responsive and intuitive
-- [ ] Form validations provide clear error messages
-- [ ] Navigation between pages works smoothly
-- [ ] Mobile responsiveness works correctly
-- [ ] Browser compatibility (Chrome, Firefox, Safari, Edge)
-
-## Security
-- [ ] SQL injection prevention works
-- [ ] XSS protection is in place
-- [ ] Session data is protected
-- [ ] Sensitive data is not exposed in URLs
-- [ ] Passwords are hashed (if implemented)
-- [ ] User authorization works correctly (counter vs customer features)
-
-## Error Handling
-- [ ] Database connection errors are handled gracefully
-- [ ] Network timeouts are handled appropriately
-- [ ] Invalid data submissions show user-friendly error messages
-- [ ] 404 errors show custom error pages
-- [ ] 500 errors show custom error pages
-
-## Integration Testing
-- [ ] Email notifications work (if implemented)
-- [ ] Payment integration works (if implemented)
-- [ ] External API integrations work correctly
-- [ ] Database transactions work correctly (rollback on failure)
 
 ## Browser Testing
-- [ ] Chrome latest version
-- [ ] Firefox latest version
-- [ ] Safari latest version
 - [ ] Edge latest version
-- [ ] Mobile browsers (iOS Safari, Chrome Mobile)
 
-## Final Sign-off
-- [ ] All critical path tests pass
-- [ ] All high-priority bugs are resolved
-- [ ] Performance requirements are met
-- [ ] Security requirements are met
-- [ ] Business requirements are fulfilled
-- [ ] UAT sign-off from business stakeholders obtained
+

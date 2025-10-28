@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 from db_config import create_connection, close_connection
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
-app.secret_key = 'your_secret_key_here'  # TODO: Use a secure secret key in production
+app.secret_key = 'my_serect_key_12345'  # TODO: Use a secure secret key in production
 
 def get_start_locations():
     """Fetch unique start locations from the Route table."""
@@ -327,14 +327,24 @@ def process_booking():
         session['message'] = 'Error: Schedule not found for the selected bus.'
         return redirect(url_for('home'))
 
-    # Insert bookings into database using stored procedure
+    # Insert bookings into database
     print(f"Debug: selected_seats={selected_seats}, names={names}, cids={cids}, phones={phones}")
+    seat_list = selected_seats.split(',')
     connection = create_connection()
     booking_success = False
     if connection:
         try:
             cursor = connection.cursor()
-            cursor.callproc('ProcessBooking', (user_id, schedule_id, selected_seats, ','.join(names), ','.join(cids), ','.join(phones)))
+            for i, seat in enumerate(seat_list):
+                seat_no = int(seat)
+                # Check if seat is already booked
+                cursor.execute("SELECT COUNT(*) FROM Booking WHERE schedule_id = %s AND seat_no = %s AND status = 'Confirmed'", (schedule_id, seat_no))
+                if cursor.fetchone()[0] > 0:
+                    raise Exception(f'Seat {seat_no} already booked')
+                # Update available seats
+                cursor.execute("UPDATE Schedule SET available_seats = available_seats - 1 WHERE schedule_id = %s", (schedule_id,))
+                # Insert booking
+                cursor.execute("INSERT INTO Booking (user_id, schedule_id, seat_no, seats_booked, passenger_name, passenger_cid, phone, status) VALUES (%s, %s, %s, 1, %s, %s, %s, 'Confirmed')", (user_id, schedule_id, seat_no, names[i], int(cids[i]), int(phones[i])))
             connection.commit()
             booking_success = True
             print(f"Booking completed for bus {bus_no}: seats {selected_seats}")
@@ -380,9 +390,10 @@ def counter_dashboard():
 
             # Build query for bookings
             query = """
-                SELECT b.booking_id, b.passenger_name, b.seat_no, b.status, b.user_type,
+                SELECT b.booking_id, b.passenger_name, b.seat_no, b.status, ua.user_type,
                        s.bus_no, r.start, r.destination, s.ticket_price,
-                       ua.name as booked_by_name, b.booked_at, b.phone, b.passenger_cid, s.reporting_time, s.travel_time
+                       b.booked_at, b.phone,
+                       ua.name as booked_by_name
                 FROM Booking b
                 JOIN Schedule s ON b.schedule_id = s.schedule_id
                 JOIN Route r ON s.route_id = r.route_id
@@ -403,24 +414,20 @@ def counter_dashboard():
 
             cursor.execute(query, params)
             results = cursor.fetchall()
-            print(f"Debug: Found {len(results)} bookings in counter dashboard")
 
             for row in results:
                 bookings.append({
                     'booking_id': row[0],
                     'passenger_name': row[1],
+                    'passenger_phone': row[10],
                     'seat_no': row[2],
                     'status': row[3],
                     'user_type': row[4],
                     'bus_no': row[5],
                     'route': f"{row[6]} - {row[7]}",
                     'price': row[8],
-                    'booked_by': row[9] or 'Counter',
-                    'booking_date': row[10].strftime('%Y-%m-%d %H:%M:%S') if row[10] else 'N/A',
-                    'passenger_phone': row[11],
-                    'passenger_cid': row[12],
-                    'reporting_time': str(row[13]) if row[13] else 'N/A',
-                    'departure_time': str(row[14]) if row[14] else 'N/A'
+                    'booking_date': row[9].strftime('%Y-%m-%d %H:%M:%S') if row[9] else 'N/A',
+                    'booked_by': row[11] or 'Counter'
                 })
 
             # Get statistics from all bookings
@@ -628,12 +635,13 @@ def my_bookings():
         try:
             cursor = connection.cursor()
             query = """
-                SELECT b.booking_id, b.passenger_name, b.seat_no, b.status, b.user_type,
+                SELECT b.booking_id, b.passenger_name, b.seat_no, b.status, ua.user_type,
                        s.bus_no, r.start, r.destination, s.ticket_price,
                        b.booked_at, b.phone, b.passenger_cid, s.reporting_time, s.travel_time
                 FROM Booking b
                 JOIN Schedule s ON b.schedule_id = s.schedule_id
                 JOIN Route r ON s.route_id = r.route_id
+                JOIN UserAccount ua ON b.user_id = ua.user_id
                 WHERE b.user_id = %s
                 ORDER BY b.booked_at DESC
             """
@@ -678,7 +686,18 @@ def update_schedule():
         if connection:
             try:
                 cursor = connection.cursor()
-                cursor.callproc('UpdateSchedule', (int(schedule_id), departure_time, arrival_time))
+                # Update Schedule table
+                cursor.execute("""
+                    UPDATE Schedule
+                    SET travel_time = %s, reporting_time = %s
+                    WHERE schedule_id = %s
+                """, (departure_time, arrival_time, int(schedule_id)))
+                # Update related bookings to 'Rescheduled'
+                cursor.execute("""
+                    UPDATE Booking
+                    SET status = 'Rescheduled'
+                    WHERE schedule_id = %s
+                """, (int(schedule_id),))
                 connection.commit()
                 session['message'] = 'Schedule updated successfully. All related bookings have been marked as rescheduled.'
             except Exception as e:

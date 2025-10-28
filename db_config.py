@@ -8,7 +8,7 @@ def create_connection():
             host='localhost',  
             user='root',       
             password='root@12345',       
-            database='drukride_db'  
+            database='DrRide_db'  
         )
         if connection.is_connected():
             print("Connected to MySQL database")
