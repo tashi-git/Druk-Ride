@@ -1,6 +1,7 @@
 import pytest
 import mysql.connector
 from datetime import datetime
+import random
 
 # ---------------- DB CONNECTION -----------------
 db_config = {
@@ -20,33 +21,29 @@ def db_connection():
     conn.close()
 
 # ---------------- HELPERS -----------------
-def insert_test_user(cursor, conn, phone='1112223333', name='Test User'):
+def insert_test_user(cursor, conn, phone=None, name='Test User'):
+    if not phone:
+        phone = f"user{random.randint(1000,9999)}@example.com"
+    password = f"pass{random.randint(1000,9999)}"
     cursor.execute("""
         INSERT INTO UserAccount (name, phone, email, password, user_type)
         VALUES (%s, %s, %s, %s, %s)
-    """, (name, phone, f"{phone}@example.com", "password123", "Passenger"))
+    """, (name, phone, f"{phone}@example.com", password, "Passenger"))
     conn.commit()
     return cursor.lastrowid
 
 def insert_test_bus(cursor, conn):
-    cursor.execute("SELECT bus_no FROM Bus LIMIT 1")
-    bus = cursor.fetchone()
-    if not bus:
-        cursor.execute("INSERT INTO Operator (company_name) VALUES ('Test Operator')")
-        operator_id = cursor.lastrowid
-        cursor.execute("INSERT INTO Bus (bus_no, operator_id, capacity) VALUES ('TEST001', %s, 30)", (operator_id,))
-        conn.commit()
-        return 'TEST001'
-    return bus['bus_no']
+    bus_no = f"BUS{random.randint(1000,9999)}"
+    cursor.execute("INSERT INTO Operator (company_name) VALUES ('Test Operator')")
+    operator_id = cursor.lastrowid
+    cursor.execute("INSERT INTO Bus (bus_no, operator_id, capacity) VALUES (%s, %s, 30)", (bus_no, operator_id))
+    conn.commit()
+    return bus_no
 
 def insert_test_route(cursor, conn):
-    cursor.execute("SELECT route_id FROM Route LIMIT 1")
-    route = cursor.fetchone()
-    if not route:
-        cursor.execute("INSERT INTO Route (start, destination, distance) VALUES ('A', 'B', 50)")
-        conn.commit()
-        return cursor.lastrowid
-    return route['route_id']
+    cursor.execute("INSERT INTO Route (start, destination, distance) VALUES ('A', 'B', 50)")
+    conn.commit()
+    return cursor.lastrowid
 
 def insert_test_schedule(cursor, conn, bus_no=None, route_id=None):
     if not bus_no:
@@ -66,15 +63,15 @@ def test_home_page():
 
 def test_user_registration(db_connection):
     cursor, conn = db_connection
-    user_id = insert_test_user(cursor, conn, phone='8887776666', name='Reg User')
-    cursor.execute("SELECT * FROM UserAccount WHERE phone='8887776666'")
+    user_id = insert_test_user(cursor, conn, phone=f"reg{random.randint(1000,9999)}", name='Reg User')
+    cursor.execute("SELECT * FROM UserAccount WHERE user_id=%s", (user_id,))
     user = cursor.fetchone()
     assert user is not None
     assert user['name'] == 'Reg User'
 
 def test_user_login(db_connection):
     cursor, conn = db_connection
-    phone = '1112223333'
+    phone = f"login{random.randint(1000,9999)}"
     insert_test_user(cursor, conn, phone=phone, name='Login User')
     cursor.execute("SELECT * FROM UserAccount WHERE phone=%s", (phone,))
     user = cursor.fetchone()
@@ -116,7 +113,6 @@ def test_booking_cancellation(db_connection):
     """, (user_id, schedule_id))
     booking_id = cursor.lastrowid
     conn.commit()
-    # Cancel booking
     cursor.execute("UPDATE Booking SET status='Cancelled' WHERE booking_id=%s", (booking_id,))
     conn.commit()
     cursor.execute("SELECT status FROM Booking WHERE booking_id=%s", (booking_id,))
