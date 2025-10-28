@@ -4,9 +4,9 @@ from datetime import datetime
 
 # ---------------- DB CONNECTION -----------------
 db_config = {
-    "host": "localhost",
+    "host": "127.0.0.1",
     "user": "root",
-    "password": "password",
+    "password": "root@12345",
     "database": "drukride_db"
 }
 
