@@ -9,7 +9,7 @@ from flask import session
 def client():
     """Create a Flask test client for sending HTTP requests to the app."""
     flask_app.config['TESTING'] = True
-    flask_app.config['SECRET_KEY'] = 'test_secret_key'
+    flask_app.config['SECRET_KEY'] = 'test_secret_key_123'
     with flask_app.test_client() as client:
         with flask_app.app_context():
             yield client
@@ -69,7 +69,7 @@ def test_user_registration(client, db_connection):
         'phone': '8887776666',
         'email': 'newuser@example.com',
         'password': 'password123',
-        'user_type': 'customer'
+        'user_type': 'passenger'
     })
     assert response.status_code == 302
     assert '/login' in response.headers['Location']
