@@ -113,6 +113,7 @@ CREATE TABLE Schedule (
     route_id INT NOT NULL,
     reporting_time  TIME NOT NULL,
     travel_time TIME NOT NULL,
+    ticket_price DECIMAL(8,2) NOT NULL,
     available_seats INT NOT NULL CHECK (available_seats >= 0),
     FOREIGN KEY (bus_no) REFERENCES Bus(bus_no)
         ON DELETE CASCADE,
@@ -120,57 +121,57 @@ CREATE TABLE Schedule (
         ON DELETE CASCADE,
     UNIQUE (bus_no, travel_time)
 );
-INSERT INTO Schedule (bus_no, route_id, reporting_time, travel_time, available_seats) VALUES
+INSERT INTO Schedule (bus_no, route_id, reporting_time, travel_time, ticket_price, available_seats) VALUES
 -- BP-1: Phuentsholing – Thimphu
-('BP-1-A1088', 23, '06:30:00', '07:00:00', 19),  -- Bumpa
-('BP-1-B1802', 23, '11:00:00', '11:30:00', 32),  -- Dhug
-('BP-1-A1903', 23, '14:00:00', '14:30:00', 19),  -- Khorlo
+('BP-1-A1088', 23, '06:30:00', '07:00:00', 0, 19),  -- Bumpa
+('BP-1-B1802', 23, '11:00:00', '11:30:00', 0, 32),  -- Dhug
+('BP-1-A1903', 23, '14:00:00', '14:30:00', 0, 19),  -- Khorlo
 -- BP-2: Thimphu – Paro
-('BP-2-A2001', 1, '08:30:00', '09:00:00', 19),  -- Meto
-('BP-2-B2002', 2, '13:30:00', '14:00:00', 19),  -- Sernya
+('BP-2-A2001', 1, '08:30:00', '09:00:00', 0, 19),  -- Meto
+('BP-2-B2002', 2, '13:30:00', '14:00:00', 0, 19),  -- Sernya
 -- BP-1: Thimphu – Punakha
-('BP-1-A1004', 3, '09:30:00', '10:00:00', 19),  -- Bumpa
-('BP-1-B1005', 3, '13:00:00', '13:30:00', 32),  -- Khorlo
+('BP-1-A1004', 3, '09:30:00', '10:00:00', 0, 19),  -- Bumpa
+('BP-1-B1005', 3, '13:00:00', '13:30:00', 0, 32),  -- Khorlo
 -- BP-2: Thimphu – Haa
-('BP-2-A2003', 5, '07:00:00', '07:30:00', 32),  -- Dhug
+('BP-2-A2003', 5, '07:00:00', '07:30:00', 0, 32),  -- Dhug
 -- BP-1: Wangdue – Trongsa
-('BP-1-A1006', 9, '07:30:00', '08:00:00', 19),  -- Bumpa
-('BP-1-B1007', 9, '08:30:00', '09:00:00', 32),  -- Meto
+('BP-1-A1006', 9, '07:30:00', '08:00:00', 0, 19),  -- Bumpa
+('BP-1-B1007', 9, '08:30:00', '09:00:00', 0, 32),  -- Meto
 -- BP-2: Trongsa – Bumthang
-('BP-2-A2004', 11, '10:30:00', '11:00:00', 32),  -- Khorlo
-('BP-2-B2005', 11, '12:00:00', '12:30:00', 19),  -- Sernya
+('BP-2-A2004', 11, '10:30:00', '11:00:00', 0, 32),  -- Khorlo
+('BP-2-B2005', 11, '12:00:00', '12:30:00', 0, 19),  -- Sernya
 -- BP-1: Bumthang – Mongar
-('BP-1-A1008', 15, '07:30:00', '08:00:00', 32),  -- Bumpa
-('BP-1-B1009', 15, '08:30:00', '09:00:00', 32),  -- Dhug
+('BP-1-A1008', 15, '07:30:00', '08:00:00', 0, 32),  -- Bumpa
+('BP-1-B1009', 15, '08:30:00', '09:00:00', 0, 32),  -- Dhug
 -- BP-2: Mongar – Trashigang
-('BP-2-A2006', 17, '06:30:00', '07:00:00', 32),  -- Meto
-('BP-2-B2007', 17, '07:00:00', '07:30:00', 28),  -- Sernya
+('BP-2-A2006', 17, '06:30:00', '07:00:00', 0, 32),  -- Meto
+('BP-2-B2007', 17, '07:00:00', '07:30:00', 0, 28),  -- Sernya
 -- BP-1: Trashigang – Trashiyangtse
-('BP-1-A1010', 19, '08:00:00', '08:30:00', 28),  -- Khorlo
+('BP-1-A1010', 19, '08:00:00', '08:30:00', 0, 28),  -- Khorlo
 -- BP-2: Mongar – Lhuentse
-('BP-2-A2008', 21, '09:30:00', '10:00:00', 28),  -- Dhug
+('BP-2-A2008', 21, '09:30:00', '10:00:00', 0, 28),  -- Dhug
 -- BP-1: Phuentsholing – Chukha
-('BP-1-B1011', 25, '06:30:00', '07:00:00', 32),  -- Bumpa
+('BP-1-B1011', 25, '06:30:00', '07:00:00', 0, 32),  -- Bumpa
 -- BP-2: Chukha – Thimphu
-('BP-2-A2009', 27, '06:30:00', '07:00:00', 32),  -- Sernya
+('BP-2-A2009', 27, '06:30:00', '07:00:00', 0, 32),  -- Sernya
 -- BP-1: Samtse – Phuentsholing
-('BP-1-B1012', 29, '05:30:00', '06:00:00', 19),  -- Dhug
-('BP-1-A1013', 29, '07:30:00', '08:00:00', 28),  -- Khorlo
+('BP-1-B1012', 29, '05:30:00', '06:00:00', 0, 19),  -- Dhug
+('BP-1-A1013', 29, '07:30:00', '08:00:00', 0, 28),  -- Khorlo
 -- BP-2: Samtse – Dagana
-('BP-2-B2010', 31, '09:30:00', '10:00:00', 19),  -- Meto
+('BP-2-B2010', 31, '09:30:00', '10:00:00', 0, 19),  -- Meto
 -- BP-1: Dagana – Tsirang
-('BP-1-A1014', 33, '10:30:00', '11:00:00', 32),  -- Bumpa
+('BP-1-A1014', 33, '10:30:00', '11:00:00', 0, 32),  -- Bumpa
 -- BP-2: Tsirang – Sarpang
-('BP-2-B2011', 35, '10:00:00', '10:30:00', 28),  -- Dhug
+('BP-2-B2011', 35, '10:00:00', '10:30:00', 0, 28),  -- Dhug
 -- BP-1: Sarpang – Gelephu
-('BP-1-A1015', 37, '11:30:00', '12:00:00', 28),  -- Sernya
+('BP-1-A1015', 37, '11:30:00', '12:00:00', 0, 28),  -- Sernya
 -- BP-2: Sarpang – Zhemgang
-('BP-2-B2012', 39, '09:00:00', '09:30:00', 19),  -- Meto
+('BP-2-B2012', 39, '09:00:00', '09:30:00', 0, 19),  -- Meto
 -- BP-1: Samdrup Jongkhar – Trashigang
-('BP-1-A1016', 41, '06:00:00', '06:30:00', 19),  -- Bumpa
-('BP-1-B1017', 41, '06:30:00', '07:00:00', 32),  -- Dhug
+('BP-1-A1016', 41, '06:00:00', '06:30:00', 0, 19),  -- Bumpa
+('BP-1-B1017', 41, '06:30:00', '07:00:00', 0, 32),  -- Dhug
 -- BP-2: Samdrup Jongkhar – Pemagatshel
-('BP-2-A2013', 43, '08:30:00', '09:00:00', 32);  -- Khorlo
+('BP-2-A2013', 43, '08:30:00', '09:00:00', 0, 32);  -- Khorlo
 
 UPDATE Schedule s
 JOIN Route r ON s.route_id = r.route_id

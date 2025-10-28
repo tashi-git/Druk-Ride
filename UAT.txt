@@ -1,0 +1,119 @@
+# User Acceptance Testing (UAT) Checklist for DrukRide App
+
+## Test Environment Setup
+- [ ] Application deployed to UAT environment
+- [ ] Database schema created and populated with test data
+- [ ] All dependencies installed correctly
+- [ ] Application accessible via web browser
+
+## User Registration and Authentication
+- [ ] User can register with valid details (name, phone, email, password, user type)
+- [ ] User receives appropriate error messages for invalid registration data
+- [ ] User can login with correct credentials
+- [ ] User receives error message for incorrect login credentials
+- [ ] Session management works correctly (logout, session timeout)
+- [ ] Password requirements are enforced
+
+## Customer User Features
+### Home Page and Navigation
+- [ ] Home page loads correctly with location dropdowns
+- [ ] Start and destination locations are populated correctly
+- [ ] Navigation menu displays appropriate options for customer users
+
+### Bus Search and Selection
+- [ ] User can search for buses by selecting from/to locations and date
+- [ ] Available buses are displayed with correct details (operator, bus number, route, time, price)
+- [ ] Bus selection redirects to booking page
+- [ ] Invalid search criteria show appropriate error messages
+
+### Seat Selection and Booking
+- [ ] Seat layout displays correctly with available seats in green
+- [ ] Booked seats are displayed in yellow and cannot be selected
+- [ ] User can select multiple seats up to the specified number
+- [ ] Selected seats are highlighted in blue
+- [ ] Confirm booking button is disabled when no seats are selected
+- [ ] Booking form collects passenger details correctly (name, CID, phone)
+- [ ] Booking confirmation page displays correct details and total price
+- [ ] Successful booking shows confirmation message
+- [ ] Failed booking shows appropriate error message
+
+### My Bookings
+- [ ] User can view their booking history
+- [ ] Bookings display correct information (bus details, seat, status, dates)
+- [ ] Reporting time and departure time are displayed correctly
+- [ ] Booking status is shown accurately (Confirmed, Cancelled, Rescheduled)
+
+## Counter User Features
+### Counter Dashboard
+- [ ] Counter user can access dashboard after login
+- [ ] Dashboard shows today's statistics (total bookings, confirmed, cancelled, revenue, available seats)
+- [ ] Recent bookings table displays correctly with all columns
+- [ ] Search functionality works for passenger name, counter name, or bus number
+- [ ] Status filter works correctly
+- [ ] Booking details include phone, CID, reporting time, departure time
+
+### Booking Management
+- [ ] Counter can cancel confirmed bookings
+- [ ] Cancelled bookings update status correctly
+- [ ] Counter can book on behalf of customers
+- [ ] Counter booking process collects customer and passenger details
+- [ ] Counter bookings are marked with correct user type
+
+### Schedule Management
+- [ ] Counter can view all schedules
+- [ ] Update schedule form displays current times
+- [ ] Schedule updates change departure and reporting times
+- [ ] Schedule updates trigger status change to 'Rescheduled' for affected bookings
+- [ ] Schedule updates show success message
+
+## Data Integrity and Business Rules
+- [ ] Duplicate bookings are prevented for the same seat/schedule
+- [ ] Available seats count updates correctly after bookings
+- [ ] Revenue calculations are accurate
+- [ ] CID validation works for large numbers (BIGINT support)
+- [ ] Phone number validation works correctly
+- [ ] Date validations prevent past date bookings
+
+## Performance and Usability
+- [ ] Page load times are acceptable (< 3 seconds)
+- [ ] Seat selection is responsive and intuitive
+- [ ] Form validations provide clear error messages
+- [ ] Navigation between pages works smoothly
+- [ ] Mobile responsiveness works correctly
+- [ ] Browser compatibility (Chrome, Firefox, Safari, Edge)
+
+## Security
+- [ ] SQL injection prevention works
+- [ ] XSS protection is in place
+- [ ] Session data is protected
+- [ ] Sensitive data is not exposed in URLs
+- [ ] Passwords are hashed (if implemented)
+- [ ] User authorization works correctly (counter vs customer features)
+
+## Error Handling
+- [ ] Database connection errors are handled gracefully
+- [ ] Network timeouts are handled appropriately
+- [ ] Invalid data submissions show user-friendly error messages
+- [ ] 404 errors show custom error pages
+- [ ] 500 errors show custom error pages
+
+## Integration Testing
+- [ ] Email notifications work (if implemented)
+- [ ] Payment integration works (if implemented)
+- [ ] External API integrations work correctly
+- [ ] Database transactions work correctly (rollback on failure)
+
+## Browser Testing
+- [ ] Chrome latest version
+- [ ] Firefox latest version
+- [ ] Safari latest version
+- [ ] Edge latest version
+- [ ] Mobile browsers (iOS Safari, Chrome Mobile)
+
+## Final Sign-off
+- [ ] All critical path tests pass
+- [ ] All high-priority bugs are resolved
+- [ ] Performance requirements are met
+- [ ] Security requirements are met
+- [ ] Business requirements are fulfilled
+- [ ] UAT sign-off from business stakeholders obtained
