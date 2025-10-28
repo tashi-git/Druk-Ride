@@ -15,26 +15,32 @@ def db_connection():
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
     yield cursor, conn
-    # cleanup after each test
-    cursor.execute("DELETE FROM Booking")
-    cursor.execute("DELETE FROM Schedule")
-    cursor.execute("DELETE FROM Bus")
-    cursor.execute("DELETE FROM Operator")
-    cursor.execute("DELETE FROM Route")
-    cursor.execute("DELETE FROM UserAccount")
     conn.commit()
     cursor.close()
     conn.close()
 
 # ---------------- HELPERS -----------------
+def clean_tables(cursor, conn):
+    cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
+    cursor.execute("TRUNCATE TABLE Booking")
+    cursor.execute("TRUNCATE TABLE Schedule")
+    cursor.execute("TRUNCATE TABLE Bus")
+    cursor.execute("TRUNCATE TABLE Route")
+    cursor.execute("TRUNCATE TABLE Operator")
+    cursor.execute("TRUNCATE TABLE UserAccount")
+    cursor.execute("SET FOREIGN_KEY_CHECKS = 1")
+    conn.commit()
+
 def insert_test_user(cursor, conn, phone=None, name='Test User'):
+    clean_tables(cursor, conn)  # clean before insert
     if not phone:
-        phone = f"{random.randint(1000000000, 9999999999)}"  # 10-digit phone
+        phone = random.randint(700000000, 799999999)  # numeric within INT range
     password = f"pass{random.randint(1000,9999)}"
+    email = f"user{random.randint(1000,9999)}@example.com"
     cursor.execute("""
         INSERT INTO UserAccount (name, phone, email, password, user_type)
         VALUES (%s, %s, %s, %s, %s)
-    """, (name, phone, f"user{random.randint(1000,9999)}@example.com", password, "Passenger"))
+    """, (name, phone, email, password, "Passenger"))
     conn.commit()
     return cursor.lastrowid
 
@@ -72,24 +78,26 @@ def insert_test_schedule(cursor, conn, bus_no=None, route_id=None):
 
 # ---------------- TEST CASES -----------------
 def test_home_page():
-    assert True
+    assert True  # dummy test
 
 def test_user_registration(db_connection):
     cursor, conn = db_connection
-    user_id = insert_test_user(cursor, conn, phone='8887776666', name='Reg User')
-    cursor.execute("SELECT * FROM UserAccount WHERE phone='8887776666'")
+    user_id = insert_test_user(cursor, conn, phone=777111222, name='Reg User')
+    cursor.execute("SELECT * FROM UserAccount WHERE name='Reg User'")
     user = cursor.fetchone()
     assert user is not None
     assert user['name'] == 'Reg User'
+    clean_tables(cursor, conn)
 
 def test_user_login(db_connection):
     cursor, conn = db_connection
-    phone = '1112223333'
+    phone = 777222333
     insert_test_user(cursor, conn, phone=phone, name='Login User')
     cursor.execute("SELECT * FROM UserAccount WHERE phone=%s", (phone,))
     user = cursor.fetchone()
     assert user is not None
     assert user['name'] == 'Login User'
+    clean_tables(cursor, conn)
 
 def test_booking_search(db_connection):
     cursor, conn = db_connection
@@ -98,6 +106,7 @@ def test_booking_search(db_connection):
     schedule = cursor.fetchone()
     assert schedule is not None
     assert schedule['available_seats'] > 0
+    clean_tables(cursor, conn)
 
 def test_seat_booking(db_connection):
     cursor, conn = db_connection
@@ -105,16 +114,17 @@ def test_seat_booking(db_connection):
     schedule_id = insert_test_schedule(cursor, conn)
     cursor.execute("""
         INSERT INTO Booking (user_id, schedule_id, seat_no, seats_booked, passenger_name, passenger_cid, phone)
-        VALUES (%s, %s, 1, 1, 'Passenger1', 123456789012, '7778889999')
+        VALUES (%s, %s, 1, 1, 'Passenger1', 123456789012, 777333444)
     """, (user_id, schedule_id))
     conn.commit()
     cursor.execute("SELECT * FROM Booking WHERE user_id=%s AND schedule_id=%s", (user_id, schedule_id))
     booking = cursor.fetchone()
     assert booking is not None
     assert booking['seat_no'] == 1
+    clean_tables(cursor, conn)
 
 def test_counter_dashboard():
-    assert True
+    assert True  # dummy test
 
 def test_booking_cancellation(db_connection):
     cursor, conn = db_connection
@@ -122,7 +132,7 @@ def test_booking_cancellation(db_connection):
     schedule_id = insert_test_schedule(cursor, conn)
     cursor.execute("""
         INSERT INTO Booking (user_id, schedule_id, seat_no, seats_booked, passenger_name, passenger_cid, phone)
-        VALUES (%s, %s, 2, 1, 'Passenger2', 123456789013, '7778880000')
+        VALUES (%s, %s, 2, 1, 'Passenger2', 123456789013, 777444555)
     """, (user_id, schedule_id))
     booking_id = cursor.lastrowid
     conn.commit()
@@ -131,6 +141,7 @@ def test_booking_cancellation(db_connection):
     cursor.execute("SELECT status FROM Booking WHERE booking_id=%s", (booking_id,))
     status = cursor.fetchone()['status']
     assert status == 'Cancelled'
+    clean_tables(cursor, conn)
 
 def test_schedule_update(db_connection):
     cursor, conn = db_connection
@@ -140,6 +151,7 @@ def test_schedule_update(db_connection):
     cursor.execute("SELECT ticket_price FROM Schedule WHERE schedule_id=%s", (schedule_id,))
     price = cursor.fetchone()['ticket_price']
     assert price == 200
+    clean_tables(cursor, conn)
 
 def test_my_bookings(db_connection):
     cursor, conn = db_connection
@@ -147,12 +159,13 @@ def test_my_bookings(db_connection):
     schedule_id = insert_test_schedule(cursor, conn)
     cursor.execute("""
         INSERT INTO Booking (user_id, schedule_id, seat_no, seats_booked, passenger_name, passenger_cid, phone)
-        VALUES (%s, %s, 3, 1, 'Passenger3', 123456789014, '7778881111')
+        VALUES (%s, %s, 3, 1, 'Passenger3', 123456789014, 777555666)
     """, (user_id, schedule_id))
     conn.commit()
     cursor.execute("SELECT * FROM Booking WHERE user_id=%s", (user_id,))
     bookings = cursor.fetchall()
     assert len(bookings) > 0
+    clean_tables(cursor, conn)
 
 def test_logout():
-    assert True
+    assert True  # dummy test
