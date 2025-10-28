@@ -1,4 +1,4 @@
-CREATE DATABASE drukride_db;
+CREATE DATABASE IF NOT EXISTS drukride_db;
 USE drukride_db;
 
 
