@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings - DrukRide</title>
+    <link rel="stylesheet" href="../static/styles.css">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburgerMenu = document.getElementById('hamburger-menu');
+            const menu = document.getElementById('menu');
+
+            hamburgerMenu.addEventListener('mouseenter', function() {
+                menu.classList.add('active');
+            });
+
+            hamburgerMenu.addEventListener('mouseleave', function() {
+                menu.classList.remove('active');
+            });
+
+            // Auto-hide message after 7 seconds
+            const messageDiv = document.querySelector('.message');
+            if (messageDiv) {
+                setTimeout(function() {
+                    messageDiv.style.display = 'none';
+                }, 7000); // 7 seconds
+            }
+        });
+    </script>
+    <style>
+        .bookings-section {
+            padding: 40px 0;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .bookings-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .bookings-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .bookings-header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        .bookings-header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .bookings-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .bookings-table th,
+        .bookings-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .bookings-table th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .bookings-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .booking-item {
+            transition: background-color 0.3s;
+        }
+
+        .booking-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-confirmed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .booking-details {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .booking-route {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .booking-price {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .no-bookings {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .no-bookings h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .no-bookings p {
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .btn-book-now {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .btn-book-now:hover {
+            background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+        }
+
+        @media (max-width: 768px) {
+            .bookings-card {
+                padding: 20px;
+                margin: 0 10px;
+            }
+
+            .bookings-table {
+                font-size: 14px;
+            }
+
+            .bookings-table th,
+            .bookings-table td {
+                padding: 10px 8px;
+            }
+
+            .bookings-header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hamburger-menu" id="hamburger-menu">
+        <div class="hamburger-icon">&#9776;</div>
+        <nav class="menu" id="menu">
+            <ul>
+                {% if session.user_name %}
+                <li>Welcome, {{ session.user_name }}!</li>
+                {% if session.user_type == 'counter' %}
+                <li><a href="/counter_dashboard">Counter Dashboard</a></li>
+                {% endif %}
+                <li><a href="/logout">Logout</a></li>
+                {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+                {% endif %}
+                <li><a href="/my_bookings">My Bookings</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <header>
+        <h1>My Bookings</h1>
+        <p>View and manage your bus ticket bookings</p>
+    </header>
+
+    <section class="bookings-section">
+        <div class="container">
+            <div class="bookings-card">
+                <div class="bookings-header">
+                    <h1>📋 My Booking History</h1>
+                    <p>Track all your bus reservations and ticket details</p>
+                </div>
+
+                {% if bookings %}
+                <table class="bookings-table">
+                    <thead>
+                        <tr>
+                            <th>Booking ID</th>
+                            <th>Passenger</th>
+                            <th>Bus Details</th>
+                            <th>Route</th>
+                            <th>Seat</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Booking Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                        <tr class="booking-item">
+                            <td>#{{ booking.booking_id }}</td>
+                            <td>
+                                <div class="booking-details">
+                                    <div><strong>{{ booking.passenger_name }}</strong></div>
+                                    <div>📞 {{ booking.passenger_phone }}</div>
+                                    <div>🆔 {{ booking.passenger_cid }}</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="booking-details">
+                                    <div><strong>{{ booking.bus_no }}</strong></div>
+                                    <div>{{ booking.user_type.title() }} Booking</div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="booking-route">{{ booking.route }}</div>
+                            </td>
+                            <td>{{ booking.seat_no }}</td>
+                            <td>
+                                <div class="booking-price">Nu. {{ booking.price }}</div>
+                            </td>
+                            <td>
+                                <span class="booking-status status-{{ booking.status.lower() }}">
+                                    {{ booking.status }}
+                                </span>
+                            </td>
+                            <td>{{ booking.booking_date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="no-bookings">
+                    <h3>No Bookings Found</h3>
+                    <p>You haven't made any bookings yet. Start your journey with DrukRide!</p>
+                    <a href="/" class="btn-book-now">Book Your First Trip</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 DrukRide. All rights reserved.</p>
+            <p>Contact us: info@drukride.bt | +975 178 8745</p>
+        </div>
+    </footer>
+</body>
+</html>

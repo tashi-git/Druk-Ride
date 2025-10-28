@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DrukRide - Bus Booking App</title>
+    <link rel="stylesheet" href="../static/styles.css">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburgerMenu = document.getElementById('hamburger-menu');
+            const menu = document.getElementById('menu');
+
+            hamburgerMenu.addEventListener('mouseenter', function() {
+                menu.classList.add('active');
+            });
+
+            hamburgerMenu.addEventListener('mouseleave', function() {
+                menu.classList.remove('active');
+            });
+
+            // Auto-hide message after 7 seconds
+            const messageDiv = document.querySelector('.message');
+            if (messageDiv) {
+                setTimeout(function() {
+                    messageDiv.style.display = 'none';
+                }, 7000); // 7 seconds
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="hamburger-menu" id="hamburger-menu">
+        <div class="hamburger-icon">&#9776;</div>
+        <nav class="menu" id="menu">
+            <ul>
+                {% if user_name %}
+                <li>Welcome, {{ user_name }}!</li>
+                {% if user_type == 'counter' %}
+                <li><a href="/counter_dashboard">Counter Dashboard</a></li>
+                {% endif %}
+                <li><a href="/logout">Logout</a></li>
+                {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+                {% endif %}
+                <li><a href="/my_bookings">My Bookings</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <header>
+        <h1>Welcome to DrukRide</h1>
+        <p>Your trusted partner for bus travel across Bhutan</p>
+        {% if message %}
+        <div class="message {{ 'success' if 'successful' in message else 'error' }}">
+            {{ message }}
+            <span class="close-btn">&times;</span>
+        </div>
+        {% endif %}
+    </header>
+
+    <section class="booking-section">
+        <div class="container">
+            <h2>Book Your Journey</h2>
+            <p>Plan your trip with ease. Select your route and travel details below.</p>
+            <form action="/book" method="post">
+                <div class="form-group">
+                    <label for="from">From:</label>
+                    <select id="from" name="from" required>
+                        <option value="">Select departure place</option>
+                        {% for location in start_locations %}
+                        <option value="{{ location }}">{{ location }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="to">To:</label>
+                    <select id="to" name="to" required>
+                        <option value="">Select destination place</option>
+                        {% for location in dest_locations %}
+                        <option value="{{ location }}">{{ location }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="date">Travel Date:</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+
+
+
+                <button type="submit">Search Buses</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="container">
+            <h2>Why Choose DrukRide?</h2>
+            <div class="feature-grid">
+                <div class="feature">
+                    <div class="icon">🚌</div>
+                    <h3>Safe & Reliable</h3>
+                    <p>Modern buses with experienced drivers ensuring your safety.</p>
+                </div>
+                <div class="feature">
+                    <div class="icon">⏰</div>
+                    <h3>On-Time Service</h3>
+                    <p>Punctual departures and arrivals for your convenience.</p>
+                </div>
+                <div class="feature">
+                    <div class="icon">🌄</div>
+                    <h3>Scenic Routes</h3>
+                    <p>Travel through breathtaking landscapes and cultural sites.</p>
+                </div>
+                <div class="feature">
+                    <div class="icon">📱</div>
+                    <h3>Easy Booking</h3>
+                    <p>Book tickets online with our user-friendly interface.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 DrukRide. All rights reserved.</p>
+            <p>Contact us: info@drukride.bt | +975 178 8745</p>
+        </div>
+    </footer>
+</body>
+</html>

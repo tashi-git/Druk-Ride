@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - DrukRide</title>
+    <link rel="stylesheet" href="../static/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Login to DrukRide</h1>
+        <p>Access your account to book and manage your trips</p>
+    </header>
+
+    <section class="login-section">
+        <div class="container">
+            <div class="login-form">
+                <div class="login-icon">🚌</div>
+                <h2>Welcome Back</h2>
+                <p class="login-subtitle">Sign in to continue your journey</p>
+                <form action="/login" method="post">
+                    <div class="form-group">
+                        <label for="username">Phone:</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">📱</span>
+                            <input type="tel" id="username" name="username" placeholder="Enter your phone number" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🔒</span>
+                            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                        </div>
+                    </div>
+                    <button type="submit">Login</button>
+                </form>
+                <p class="register-link">Don't have an account? <a href="/register">Register here</a></p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 DrukRide. All rights reserved.</p>
+            <p>Contact us: info@drukride.bt | +975 178 8745</p>
+        </div>
+    </footer>
+</body>
+</html>

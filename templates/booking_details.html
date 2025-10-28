@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Details - DrukRide</title>
+    <link rel="stylesheet" href="../static/styles.css">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburgerMenu = document.getElementById('hamburger-menu');
+            const menu = document.getElementById('menu');
+
+            hamburgerMenu.addEventListener('mouseenter', function() {
+                menu.classList.add('active');
+            });
+
+            hamburgerMenu.addEventListener('mouseleave', function() {
+                menu.classList.remove('active');
+            });
+
+            // Auto-hide message after 7 seconds
+            const messageDiv = document.querySelector('.message');
+            if (messageDiv) {
+                setTimeout(function() {
+                    messageDiv.style.display = 'none';
+                }, 7000); // 7 seconds
+            }
+        });
+    </script>
+    <style>
+        .booking-details-section {
+            padding: 40px 0;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        .booking-details-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .bus-info, .booking-summary, .passenger-form {
+            margin-bottom: 40px;
+        }
+
+        .bus-info h3, .booking-summary h3, .passenger-form h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 22px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .info-grid, .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item, .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-item:last-child, .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label, .summary-label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .info-value, .summary-value {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .summary-item.total {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #667eea;
+        }
+
+        .summary-item.total .summary-label,
+        .summary-item.total .summary-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .passengers-container {
+            display: grid;
+            gap: 25px;
+        }
+
+        .passenger-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid #e9ecef;
+        }
+
+        .passenger-card h4 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .passenger-form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 35px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            min-width: 160px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .booking-details-card {
+                padding: 20px;
+                margin: 0 10px;
+            }
+
+            .info-grid, .summary-grid, .passenger-form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hamburger-menu" id="hamburger-menu">
+        <div class="hamburger-icon">&#9776;</div>
+        <nav class="menu" id="menu">
+            <ul>
+                {% if session.user_name %}
+                <li>Welcome, {{ session.user_name }}!</li>
+                {% if session.user_type == 'counter' %}
+                <li><a href="/counter_dashboard">Counter Dashboard</a></li>
+                {% endif %}
+                <li><a href="/logout">Logout</a></li>
+                {% else %}
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Register</a></li>
+                {% endif %}
+                <li><a href="/my_bookings">My Bookings</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <header>
+        <h1>Confirm Your Booking</h1>
+        <p>Review your booking details and enter passenger information</p>
+    </header>
+
+    <section class="booking-details-section">
+        <div class="container">
+            <div class="booking-details-card">
+                <div class="bus-info">
+                    <h3>🚌 Bus Details</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Bus Number:</span>
+                            <span class="info-value">{{ bus.bus_no }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Operator:</span>
+                            <span class="info-value">{{ bus.operator_name }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Route:</span>
+                            <span class="info-value">{{ bus.start }} → {{ bus.destination }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Departure Date:</span>
+                            <span class="info-value">{{ bus.departure_date }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Departure Time:</span>
+                            <span class="info-value">{{ bus.departure_time }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Price per Seat:</span>
+                            <span class="info-value">Nu. {{ bus.price }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="booking-summary">
+                    <h3>📋 Booking Summary</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <span class="summary-label">Selected Seats:</span>
+                            <span class="summary-value">{{ selected_seats }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span class="summary-label">Number of Seats:</span>
+                            <span class="summary-value">{{ num_seats }}</span>
+                        </div>
+                        <div class="summary-item total">
+                            <span class="summary-label">Total Price:</span>
+                            <span class="summary-value">Nu. {{ total_price }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="passenger-form">
+                    <h3>👥 Passenger Details</h3>
+                    <form id="booking-form" action="{{ url_for('process_booking') }}" method="POST">
+                        <!-- Hidden fields for bus and booking info -->
+                        <input type="hidden" name="bus_no" value="{{ bus.bus_no }}">
+                        <input type="hidden" name="selected_seats" value="{{ selected_seats }}">
+                        <input type="hidden" name="num_seats" value="{{ num_seats }}">
+                        <input type="hidden" name="from_location" value="{{ bus.start }}">
+                        <input type="hidden" name="to_location" value="{{ bus.destination }}">
+                        <input type="hidden" name="travel_date" value="{{ bus.departure_date }}">
+
+                        <div class="passengers-container">
+                            {% for i in range(num_seats) %}
+                            <div class="passenger-card">
+                                <h4>Passenger {{ i + 1 }}</h4>
+                                <div class="passenger-form-grid">
+                                    <div class="form-group">
+                                        <label for="name_{{ i }}">Full Name *</label>
+                                        <input type="text" id="name_{{ i }}" name="name[]" placeholder="Enter full name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="phone_{{ i }}">Phone Number *</label>
+                                        <input type="tel" id="phone_{{ i }}" name="phone[]" placeholder="Enter phone number" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="cid_{{ i }}">CID Number *</label>
+                                        <input type="number" id="cid_{{ i }}" name="cid[]" placeholder="Enter CID number" required>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </form>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" form="booking-form" class="btn btn-primary">
+                        <span class="btn-icon">✅</span>
+                        Confirm Booking
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 DrukRide. All rights reserved.</p>
+            <p>Contact us: info@drukride.bt | +975 178 8745</p>
+        </div>
+    </footer>
+</body>
+</html>

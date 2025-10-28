@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Schedule - DrukRide</title>
+    <link rel="stylesheet" href="../static/styles.css">
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburgerMenu = document.getElementById('hamburger-menu');
+            const menu = document.getElementById('menu');
+
+            hamburgerMenu.addEventListener('mouseenter', function() {
+                menu.classList.add('active');
+            });
+
+            hamburgerMenu.addEventListener('mouseleave', function() {
+                menu.classList.remove('active');
+            });
+
+            // Auto-hide message after 7 seconds
+            const messageDiv = document.querySelector('.message');
+            if (messageDiv) {
+                setTimeout(function() {
+                    messageDiv.style.display = 'none';
+                }, 7000); // 7 seconds
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="hamburger-menu" id="hamburger-menu">
+        <div class="hamburger-icon">&#9776;</div>
+        <nav class="menu" id="menu">
+            <ul>
+                <li><a href="/counter_dashboard">Counter Dashboard</a></li>
+                <li><a href="/book_on_behalf">Book on Behalf</a></li>
+                <li><a href="/update_schedule">Update Schedule</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <header>
+        <h1>Update Bus Schedule</h1>
+        <p>Modify bus schedules and automatically notify affected passengers</p>
+        {% if session.get('message') %}
+        <div class="message {{ 'success' if 'success' in session.get('message').lower() else 'error' }}">
+            {{ session.get('message') }}
+            <span class="close-btn">&times;</span>
+        </div>
+        {% endif %}
+    </header>
+
+    <section class="booking-section">
+        <div class="container">
+            <h2>Schedule Management</h2>
+            <p>Select a bus schedule to update. All related bookings will be automatically marked as 'Rescheduled'.</p>
+
+            <form method="POST" action="/update_schedule" class="schedule-form">
+                <div class="form-group">
+                    <label for="schedule_id">Select Schedule:</label>
+                    <select id="schedule_id" name="schedule_id" required>
+                        <option value="">Choose a schedule to update...</option>
+                        {% for schedule in schedules %}
+                        <option value="{{ schedule.schedule_id }}">
+                            {{ schedule.bus_no }} - {{ schedule.route }} (Current: {{ schedule.departure_time }} → {{ schedule.arrival_time }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="departure_time">New Departure Time:</label>
+                        <input type="time" id="departure_time" name="departure_time" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="arrival_time">New Arrival Time:</label>
+                        <input type="time" id="arrival_time" name="arrival_time" required>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Update Schedule</button>
+                    <a href="/counter_dashboard" class="btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="container">
+            <h2>Schedule Update Guidelines</h2>
+            <div class="feature-grid">
+                <div class="feature">
+                    <div class="icon">⚠️</div>
+                    <h3>Automatic Notifications</h3>
+                    <p>When you update a schedule, all affected bookings are automatically marked as 'Rescheduled'.</p>
+                </div>
+                <div class="feature">
+                    <div class="icon">🕒</div>
+                    <h3>Time Format</h3>
+                    <p>Use 24-hour format (HH:MM) for accurate schedule updates.</p>
+                </div>
+                <div class="feature">
+                    <div class="icon">📋</div>
+                    <h3>Review Changes</h3>
+                    <p>Double-check the new times before submitting to avoid errors.</p>
+                </div>
+                <div class="feature">
+                    <div class="icon">🔄</div>
+                    <h3>Real-time Updates</h3>
+                    <p>Changes take effect immediately in the system.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 DrukRide. All rights reserved.</p>
+            <p>Contact us: info@drukride.bt | +975 178 8745</p>
+        </div>
+    </footer>
+</body>
+</html>

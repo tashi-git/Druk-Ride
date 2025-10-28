@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Buses - DrukRide</title>
+    <link rel="stylesheet" href="../static/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Available Buses</h1>
+        <p>Choose your preferred bus for the selected route and date</p>
+    </header>
+
+    <section class="schedule-section">
+        <div class="container">
+            <h2>Bus Schedules</h2>
+            {% if buses %}
+            <div class="bus-list">
+                {% for bus in buses %}
+                <div class="bus-card">
+                    <div class="bus-info">
+                        <h3>{{ bus.operator_name }}</h3>
+                        <p><strong>Bus No:</strong> {{ bus.bus_no }}</p>
+                        <p><strong>Route:</strong> {{ bus.start }} to {{ bus.destination }}</p>
+                        <p><strong>Reporting Time:</strong> {{ bus.reporting_time }}</p>
+                        <p><strong>Departure Time:</strong> {{ bus.departure_time }}</p>
+                        <p><strong>Departure Date:</strong> {{ bus.departure_date }}</p>
+                        <p><strong>Ticket Price:</strong> Nu. {{ bus.price }}</p>
+                    </div>
+                    <div class="bus-actions">
+                        <form action="/booking" method="post" style="display: inline;">
+                            <input type="hidden" name="bus_no" value="{{ bus.bus_no }}">
+                            <input type="hidden" name="operator_name" value="{{ bus.operator_name }}">
+                            <input type="hidden" name="start" value="{{ bus.start }}">
+                            <input type="hidden" name="destination" value="{{ bus.destination }}">
+                            <input type="hidden" name="departure_time" value="{{ bus.departure_time }}">
+                            <input type="hidden" name="departure_date" value="{{ bus.departure_date }}">
+                            <input type="hidden" name="price" value="{{ bus.price }}">
+                            <button type="submit" class="select-bus-btn">Proceed to Booking</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="no-buses">
+                <div class="icon">🚍</div>
+                <h3>No Buses Available</h3>
+                <p>Sorry, there are no buses scheduled for the selected route and date. Please try a different route or date.</p>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 DrukRide. All rights reserved.</p>
+            <p>Contact us: info@drukride.bt | +975 178 8745</p>
+        </div>
+    </footer>
+</body>
+</html>
